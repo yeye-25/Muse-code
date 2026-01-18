@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>一个人的浪漫时光</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+
+.history-item {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px 40px 10px 10px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.history-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 107, 107, 0.7);
+    cursor: pointer;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.history-delete-btn:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.clear-all-history {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    color: #ff6b6b;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.clear-all-history:hover {
+    background: rgba(255, 107, 107, 0.2);
+}
+        :root {
+            --bg: #0f0c29;
+            --glass: rgba(255, 255, 255, 0.08);
+            --text: #f0f0f0;
+            --accent: #a2d2ff;
+            --sidebar-width: 300px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", sans-serif;
+        }
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--bg) 0%, #24243e 100%);
+            color: var(--text);
+            display: flex;
+            overflow: hidden;
+        }
+        /* 侧边栏 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            position: fixed;
+            left: -320px;
+            top: 0;
+            height: 100%;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header h2 {
+            font-size: 20px;
+            color: var(--accent);
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-btn:hover {
+            color: var(--accent);
+        }
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+        .sidebar-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* 今日计划 */
+        .plan-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .plan-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+        .plan-list {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .plan-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .plan-item span {
+            flex: 1;
+            cursor: pointer;
+        }
+        .plan-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .plan-item button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        /* 课程表 */
+        .import-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(162, 210, 255, 0.1);
+            border: 1px dashed rgba(162, 210, 255, 0.5);
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .import-btn:hover {
+            background: rgba(162, 210, 255, 0.2);
+        }
+        .course-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .course-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .course-row:last-child {
+            border-bottom: none;
+        }
+        .course-time {
+            width: 60px;
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+        .course-name {
+            flex: 1;
+            font-size: 14px;
+        }
+        /* 历史记录 */
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .history-time {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        .history-title {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .history-content {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        /* 主内容 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-open {
+            margin-left: var(--sidebar-width);
+        }
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            background: var(--accent);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #000;
+        }
+        /* 星空背景 */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        /* 主卡片 */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px 32px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        /* 番茄钟 */
+        .time-setter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .time-up, .time-down {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .time-up:hover, .time-down:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .time-value {
+            font-size: 32px;
+            font-variant-numeric: tabular-nums;
+            min-width: 60px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .time-colon {
+            font-size: 32px;
+            margin: 0 5px;
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .timer-controls button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 70px;
+        }
+        .timer-controls button:hover {
+            filter: brightness(1.15);
+        }
+        #completeBtn {
+            background: #2a9d8f;
+        }
+        /* 待办 */
+        .todo input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .todo ul {
+            list-style: none;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .todo li {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+        .todo li span {
+            cursor: pointer;
+        }
+        .done {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        /* 日记 */
+        textarea {
+            width: 100%;
+            height: 100px;
+            resize: none;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            padding: 8px 12px;
+            margin-top: 10px;
+        }
+        /* === 新版音乐面板 === */
+        .music-launcher {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 100;
+        }
+        #musicMainBtn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        #musicMainBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+        .music-panel {
+            display: none;
+            position: absolute;
+            bottom: 65px;
+            right: 0;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 22px;
+            width: 320px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .panel-header h3 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .close-panel {
+            background: transparent;
+            color: var(--text);
+            font-size: 20px;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-panel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .platform-list {
+            margin-bottom: 20px;
+        }
+        .platform-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .platform-item:hover {
+            background: var(--hover-bg);
+            border-color: rgba(162, 210, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        .platform-icon {
+            font-size: 28px;
+            margin-right: 15px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+        .platform-info {
+            flex: 1;
+        }
+        .platform-info strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .platform-info span {
+            font-size: 13px;
+            opacity: 0.8;
+            display: block;
+        }
+        .custom-search {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-search p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        #customSearchInput {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text);
+            font-size: 14px;
+        }
+        #customSearchInput:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        #customSearchBtn {
+            padding: 12px 20px;
+            white-space: nowrap;
+        }
+        /* 平台特定颜色 */
+        .qqmusic { color: #31c27c; }
+        .ncm { color: #e72d2c; }
+        .spotify { color: #1db954; }
+        .bilibili { color: #fb7299; }
+         /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 300px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .import-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .import-option {
+            background: rgba(162,210,255,0.1);
+            border: 1px solid rgba(162,210,255,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+        .import-option:hover {
+            background: rgba(162,210,255,0.2);
+            transform: translateY(-2px);
+        }
+        .import-option i {
+            color: var(--accent);
+            font-size: 20px;
+        }
+        .text-input-area {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: none;
+            margin-bottom: 15px;
+        }
+        .text-input-area:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .example-text {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 11px;
+            opacity: 0.8;
+            line-height: 1.4;
+            border-left: 3px solid var(--accent);
+        }
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: var(--accent);
+        }
+        .upload-area i {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .upload-area p {
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-confirm {
+            background: var(--accent);
+            color: #000;
+        }
+        .btn-confirm:hover {
+            filter: brightness(1.15);
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .recognizing {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .recognizing i {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        .recognizing p {
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+        .course-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .course-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .course-item:last-child {
+            border-bottom: none;
+        }
+        .course-info {
+            flex: 1;
+        }
+        .course-time {
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 14px;
+        }
+        .course-name {
+            font-size: 14px;
+            margin-top: 2px;
+        }
+        /* 在现有的textarea样式中添加多行文本支持 */
+textarea {
+    width: 100%;
+    height: 120px; /* 稍微增加高度 */
+    resize: vertical; /* 允许垂直调整大小 */
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    padding: 12px; /* 增加内边距 */
+    margin-top: 15px; /* 增加上边距 */
+    font-size: 14px;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* 焦点状态 */
+textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 2px rgba(162, 210, 255, 0.1);
+}
+
+/* 占位符样式 */
+textarea::placeholder {
+    color: rgba(240, 240, 240, 0.6);
+    font-size: 13px;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* 日记区标题样式 */
+.diary-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 15px 0 8px 0;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* 日记统计信息 */
+.diary-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* 日记保存状态提示 */
+.save-status {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 12px;
+    opacity: 0.8;
+    height: 16px;
+}
+    </style>
+</head>
+<body>
+     <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>个人中心</h2>
+            <button id="closeSidebar" class="close-btn">×</button>
+        </div>
+        
+        <div class="sidebar-content">
+            <!-- 今日计划 -->
+            <section class="sidebar-section">
+                <h3><i class="fas fa-calendar-day"></i> 今日计划</h3>
+                <div class="plan-container">
+                    <div class="plan-input">
+                        <input type="text" id="planInput" placeholder="添加今日计划...">
+                        <button id="addPlanBtn"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <ul id="planList" class="plan-list"></ul>
+                </div>
+            </section>
+            
+            <!-- 课程表 -->
+            <section class="sidebar-section">
+                <h3><i class="fas fa-table"></i> 课程表</h3>
+                <div class="course-container">
+                    <!-- 修改为一行两个按钮 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                        <button id="importCourseBtn" class="import-btn" style="flex: 1;">
+                            <i class="fas fa-plus"></i> 从教务系统导入
+                        </button>
+                        <button id="clearCoursesBtn" class="import-btn" style="background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.3); color: #ff6b6b; flex: 0; white-space: nowrap;">
+                            <i class="fas fa-trash"></i> 清空
+                        </button>
+                    </div>
+                    <div id="courseTable" class="course-table">
+                        <!-- 课程表内容会通过JS动态生成 -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 历史记录 -->
+           <!-- 在历史记录部分添加清空所有按钮 -->
+<section class="sidebar-section">
+    <h3><i class="fas fa-history"></i> 历史记录</h3>
+    <div id="historyList" class="history-list">
+        <!-- 历史记录会通过JS动态生成 -->
+    </div>
+    <button id="clearAllHistory" class="clear-all-history">
+        <i class="fas fa-trash-alt"></i> 清空所有历史记录
+    </button>
+</section>
+        </div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="main-content">
+        <!-- 侧边栏按钮 -->
+        <button id="menuBtn" class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- 星空 -->
+        <div id="stars"></div>
+        <!-- 主卡片 -->
+        <div class="card">
+            <h1>今日待办</h1>
+            <!-- 番茄钟 -->
+            <div class="timer">
+                <div class="time-setter">
+                    <div class="time-unit">
+                        <button class="time-up" data-unit="min">▲</button>
+                        <div class="time-value" id="minutes">25</div>
+                        <button class="time-down" data-unit="min">▼</button>
+                    </div>
+                    <span class="time-colon">:</span>
+                    <div class="time-unit">
+                        <button class="time-up" data-unit="sec">▲</button>
+                        <div class="time-value" id="seconds">00</div>
+                        <button class="time-down" data-unit="sec">▼</button>
+                    </div>
+                </div>
+                
+                <div class="timer-controls">
+                    <button id="startBtn">开始</button>
+                    <button id="resetBtn">重置</button>
+                    <button id="completeBtn">完成</button>
+                </div>
+            </div>
+            <!-- 待办 -->
+            <div class="todo">
+                <input id="todoInput" placeholder="写下今晚的小计划...">
+                <ul id="todoList"></ul>
+            </div>
+        <!-- 日记 -->
+<div class="diary-container">
+    <div class="diary-label">
+        <i class="fas fa-book"></i>
+        <span>今日日记</span>
+    </div>
+    <textarea id="diary" placeholder="📝 写下今天的感动...
+• 今天最有成就感的一件事
+• 遇到的小确幸或小烦恼
+• 明天的期待
+• 想对自己说的话
+让你的文字成为时光的印记..."></textarea>
+    <div class="diary-stats">
+        <span id="wordCount">0 字</span>
+        <span id="lastSaved">已自动保存</span>
+    </div>
+    <div id="saveStatus" class="save-status"></div></div>
+</div>
+    <!-- 音乐启动面板 -->
+    <div class="music-launcher">
+        <button id="musicMainBtn">🎵 音乐伴侣</button>
+        <div class="music-panel" id="musicPanel">
+            <div class="panel-header">
+                <h3>🎶 选择音乐平台</h3>
+                <button class="close-panel" id="closePanelBtn">×</button>
+            </div>
+            
+            <div class="platform-list">
+                <div class="platform-item" data-platform="qqmusic" 
+                     data-url="https://y.qq.com/portal/search.html?remoteplace=txt.yqq.top&t=song&w=轻音乐 钢琴 安静 氛围">
+                    <div class="platform-icon qqmusic">🎹</div>
+                    <div class="platform-info">
+                        <strong>QQ音乐</strong>
+                        <span>轻音乐 · 钢琴 · 安静 · 氛围</span>
+                    </div>
+                </div>
+                
+                <div class="platform-item" data-platform="ncm"
+                     data-url="https://music.163.com/#/search/m/?s=自习 学习 专注 白噪音&type=1">
+                    <div class="platform-icon ncm">☁️</div>
+                    <div class="platform-info">
+                        <strong>网易云音乐</strong>
+                        <span>自习 · 学习 · 专注 · 白噪音</span>
+                    </div>
+                </div>
+                <div class="platform-item" data-platform="bilibili"
+                     data-url="https://www.bilibili.com/c/music/?spm_id_from=333.1007.0.0">
+                    <div class="platform-icon bilibili">📺</div>
+                    <div class="platform-info">
+                        <strong>哔哩哔哩音频区</strong>
+                        <span>音乐专区</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="custom-search">
+                <p>或搜索任意歌曲/歌手</p>
+                <div class="search-box">
+                    <input type="text" id="customSearchInput" placeholder="例如：周杰伦、古典音乐...">
+                    <button id="customSearchBtn">搜索</button>
+                </div>
+                <div class="search-options" style="margin-top: 12px; text-align: center;">
+                    <small style="opacity: 0.7;">将在
+                        <select id="platformSelect" style="background: rgb(255, 255, 255); color: rgb(0, 0, 0); border: none; border-radius: 4px; padding: 2px 8px;">
+                            <option value="qqmusic">QQ音乐</option>
+                            <option value="ncm">网易云</option>
+                        </select>
+                        中搜索
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ========== 全局变量初始化 ========== */
+        
+        // 课程数据
+        const defaultCourses = [
+            { time: '08:00', name: '网络消费者行为学' },
+            { time: '09:00', name: '广告学' },
+            { time: '10:00', name: '金融产品营销' },
+            { time: '11:00', name: '数字新媒体营销' },
+            { time: '14:00', name: '毛概' },
+            { time: '16:00', name: '体育课健美操' }
+        ];
+        
+        // 全局变量
+        window.courses = JSON.parse(localStorage.getItem('solo-courses')) || [...defaultCourses];
+        window.historyRecords = JSON.parse(localStorage.getItem('solo-history')) || [];
+        
+        /* ========== DOM元素获取 ========== */
+        const menuBtn = document.getElementById('menuBtn');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const stars = document.getElementById('stars');
+        const planInput = document.getElementById('planInput');
+        const addPlanBtn = document.getElementById('addPlanBtn');
+        const planList = document.getElementById('planList');
+        const importCourseBtn = document.getElementById('importCourseBtn');
+        const clearCoursesBtn = document.getElementById('clearCoursesBtn');
+        const courseTable = document.getElementById('courseTable');
+        const historyList = document.getElementById('historyList');
+         const clearAllHistoryBtn = document.getElementById('clearAllHistory');
+        /* ========== 基础功能 ========== */
+        
+        // 生成星空
+        for (let i = 0; i < 120; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.animationDelay = Math.random() * 4 + 's';
+            stars.appendChild(s);
+        }
+        
+        // 侧边栏控制
+        menuBtn.onclick = () => {
+            sidebar.classList.add('active');
+            mainContent.classList.add('sidebar-open');
+        };
+        
+        closeSidebar.onclick = () => {
+            sidebar.classList.remove('active');
+            mainContent.classList.remove('sidebar-open');
+        };
+        
+        /* ========== 今日计划功能 ========== */
+        function savePlans() {
+            localStorage.setItem('solo-plans', JSON.stringify(plans));
+        }
+        
+        function drawPlans() {
+            planList.innerHTML = '';
+            plans.forEach((plan, index) => {
+                const li = document.createElement('li');
+                li.className = `plan-item ${plan.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <span onclick="togglePlan(${index})">${plan.text}</span>
+                    <button onclick="removePlan(${index})">×</button>
+                `;
+                planList.appendChild(li);
+            });
+        }
+        
+        window.togglePlan = function(index) {
+            plans[index].completed = !plans[index].completed;
+            savePlans();
+            drawPlans();
+        };
+        
+        window.removePlan = function(index) {
+            plans.splice(index, 1);
+            savePlans();
+            drawPlans();
+        };
+        
+        let plans = JSON.parse(localStorage.getItem('solo-plans') || '[]');
+        
+        addPlanBtn.onclick = () => {
+            if (planInput.value.trim()) {
+                plans.push({
+                    text: planInput.value.trim(),
+                    completed: false,
+                    time: new Date().toLocaleString()
+                });
+                planInput.value = '';
+                savePlans();
+                drawPlans();
+            }
+        };
+        
+        planInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && planInput.value.trim()) {
+                addPlanBtn.click();
+            }
+        });
+        
+        drawPlans();
+        
+        /* ========== 课程表功能 ========== */
+        
+        // 保存课程
+        function saveCourses() {
+            localStorage.setItem('solo-courses', JSON.stringify(window.courses));
+            console.log('课程已保存到本地存储');
+        }
+        
+        // 绘制课程表
+        function drawCourses() {
+            console.log('绘制课程表，课程数:', window.courses.length);
+            courseTable.innerHTML = '';
+            
+            if (window.courses.length === 0) {
+                courseTable.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.5;">暂无课程，请点击上方按钮导入</div>';
+                return;
+            }
+            
+            // 按星期分组显示
+            const dayNames = ['一', '二', '三', '四', '五', '六', '日'];
+            const dayGroups = {};
+            
+            window.courses.forEach(course => {
+                const day = course.day || 1;
+                if (!dayGroups[day]) dayGroups[day] = [];
+                dayGroups[day].push(course);
+            });
+            
+            // 按星期顺序显示
+            for (let day = 1; day <= 7; day++) {
+                if (dayGroups[day] && dayGroups[day].length > 0) {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'course-row';
+                    dayHeader.innerHTML = `<div style="width: 100%; text-align: center; color: var(--accent); font-weight: bold; padding: 8px 0; background: rgba(162,210,255,0.1); border-radius: 5px; margin: 5px 0;">星期${dayNames[day-1]}</div>`;
+                    courseTable.appendChild(dayHeader);
+                    
+                    // 按时间排序
+                    dayGroups[day].sort((a, b) => {
+                        const timeA = parseTime(a.time);
+                        const timeB = parseTime(b.time);
+                        return timeA - timeB;
+                    });
+                    
+                    dayGroups[day].forEach(course => {
+                        const row = document.createElement('div');
+                        row.className = 'course-row';
+                        
+                        // 显示周次信息
+                        let weekInfo = '';
+                        if (course.weeks && course.weeks.length > 0) {
+                            if (course.weeks.length > 5) {
+                                weekInfo = ` (${course.weeks.length}周)`;
+                            } else {
+                                weekInfo = ` (${course.weeks.join(',')}周)`;
+                            }
+                        }
+                        
+                        row.innerHTML = `
+                            <div class="course-time">${course.time}</div>
+                            <div class="course-name">
+                                <strong>${course.name}</strong>
+                                ${course.teacher ? `<br><span style="font-size: 11px; opacity: 0.8;">${course.teacher}</span>` : ''}
+                                ${course.location ? `<br><span style="font-size: 11px; opacity: 0.7;">${course.location}</span>` : ''}
+                                ${weekInfo}
+                            </div>
+                        `;
+                        courseTable.appendChild(row);
+                    });
+                }
+            }
+        }
+        
+        // 清空课程表
+        clearCoursesBtn.addEventListener('click', function() {
+            if (window.courses.length === 0) {
+                alert('课程表已经是空的！');
+                return;
+            }
+            
+            if (confirm('确定要清空所有课程吗？此操作不可撤销！')) {
+                window.courses = [];
+                saveCourses();
+                drawCourses();
+                
+                // 添加历史记录
+                addHistoryRecord('course_cleared', '清空课程表', '已清空所有课程');
+                drawHistory();
+                
+                alert('课程表已清空！');
+            }
+        });
+        
+        // 导入课程表功能
+        importCourseBtn.onclick = () => {
+            showImportOptionsModal();
+        };
+        
+        /* ========== 课程导入相关函数 ========== */
+        
+        // 显示导入选项
+        function showImportOptionsModal() {
+
+            const modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <h3><i class="fas fa-download"></i> 导入课程表</h3>
+                        <p style="text-align: center; margin-bottom: 20px; opacity: 0.8;">选择导入方式</p>
+                        
+                        <div class="import-options">
+                            <button id="pasteTextBtn" class="import-option">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-paste"></i>
+                                    <div>
+                                        <div style="font-weight: bold;">粘贴课表文本（推荐）</div>
+                                        <div style="font-size: 12px; opacity: 0.8;">直接复制粘贴格式化的课表文本</div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button id="cancelImport" class="btn-cancel">
+                                <i class="fas fa-times"></i> 取消
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+                    
+            const modal = document.createElement('div');
+            modal.innerHTML = modalHTML;
+            document.body.appendChild(modal);
+            
+            // 粘贴文本功能
+            document.getElementById('pasteTextBtn').onclick = function() {
+                showTextInputModal(modal);
+            };
+            
+            // 取消按钮
+            document.getElementById('cancelImport').onclick = function() {
+                document.body.removeChild(modal);
+            };
+        }
+        
+        // 显示文本输入模态框
+        function showTextInputModal(prevModal) {
+            if (prevModal) document.body.removeChild(prevModal);
+            
+            const modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <h3><i class="fas fa-paste"></i> 粘贴课表文本</h3>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <p style="opacity: 0.8; margin-bottom: 10px;">请粘贴你的课表文本（格式与你提供的一致）：</p>
+                            <textarea class="text-input-area" id="timetableText" placeholder="示例：
+        星期一    第1~2节 离散数学 王蓓 1-18(周) 格物楼B306
+        星期二    第3~4节 大学英语 杜明真 1-18(周) 格物楼B318
+        星期三    第5~6节 数据结构 公冶小燕 1-17(周) 格物楼B306"></textarea>
+                        </div>
+                        
+                        <div class="example-text">
+                            <div style="font-size: 12px; color: var(--accent); margin-bottom: 5px;">📋 请确保包含：</div>
+                            <div style="font-size: 11px; opacity: 0.7;">
+                                1. 星期几（星期一、星期二等）<br>
+                                2. 节次（第1~2节、第3~4节等）<br>
+                                3. 课程名称<br>
+                                4. 教师姓名<br>
+                                5. 周次（如 1-18周）<br>
+                                6. 地点（如 格物楼B306）
+                            </div>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button id="parseTextBtn" class="btn-confirm">
+                                <i class="fas fa-check"></i> 解析并导入
+                            </button>
+                            <button id="cancelTextInput" class="btn-cancel">
+                                <i class="fas fa-arrow-left"></i> 返回上一级
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modal = document.createElement('div');
+            modal.innerHTML = modalHTML;
+            document.body.appendChild(modal);
+            
+            // 解析文本按钮
+            document.getElementById('parseTextBtn').addEventListener('click', function() {
+                const text = document.getElementById('timetableText').value.trim();
+                if (!text) {
+                    alert('请输入课表文本');
+                    return;
+                }
+                
+                const parsedCourses = parseTimetableText(text);
+                if (parsedCourses.length > 0) {
+                    showParsedCourses(parsedCourses, modal);
+                } else {
+                    alert('无法解析课表文本，请检查格式是否正确');
+                }
+            });
+            
+            // 取消/返回按钮
+            document.getElementById('cancelTextInput').addEventListener('click', function() {
+                document.body.removeChild(modal);
+                showImportOptionsModal();
+            });
+        }
+        
+        // 解析课表文本
+        function parseTimetableText(text) {
+            const courses = [];
+            const lines = text.split('\n').filter(line => line.trim());
+            
+            // 节次时间映射
+            const sessionTimes = {
+                '第1~2节': '08:00',
+                '第3~4节': '10:05',
+                '第5~6节': '14:30',
+                '第7~8节': '16:35',
+                '第9~11节': '19:00'
+            };
+            
+            // 星期映射
+            const dayMapping = {
+                '星期一': 1, '星期二': 2, '星期三': 3, '星期四': 4,
+                '星期五': 5, '星期六': 6, '星期日': 7
+            };
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                
+                // 查找星期
+                let day = 0;
+                for (const dayName in dayMapping) {
+                    if (line.includes(dayName)) {
+                        day = dayMapping[dayName];
+                        break;
+                    }
+                }
+                
+                if (day === 0) return;
+                
+                // 查找节次
+                let time = '';
+                for (const session in sessionTimes) {
+                    if (line.includes(session)) {
+                        time = sessionTimes[session];
+                        break;
+                    }
+                }
+                
+                if (!time) return;
+                
+                // 提取课程信息
+                const parts = line.split(/\s+/).filter(p => p.trim());
+                
+                let courseName = '';
+                let teacher = '';
+                let weeks = [];
+                let location = '';
+                
+                for (let i = 0; i < parts.length; i++) {
+                    // 跳过星期和节次
+                    if (dayMapping[parts[i]] || Object.keys(sessionTimes).includes(parts[i])) {
+                        continue;
+                    }
+                    
+                    // 第一个非星期非节次的可能是课程名
+                    if (!courseName && parts[i]) {
+                        courseName = parts[i];
+                        continue;
+                    }
+                    
+                    // 教师名
+                    if (!teacher && /^[\u4e00-\u9fa5]{2,4}$/.test(parts[i])) {
+                        teacher = parts[i];
+                        continue;
+                    }
+                    
+                    // 周次信息
+                    if (parts[i].includes('周') && !weeks.length) {
+                        weeks = parseWeeks(parts[i]);
+                        continue;
+                    }
+                    
+                    // 地点
+                    if (!location && parts[i].match(/[楼室场厅]\d+/)) {
+                        location = parts[i];
+                        for (let j = i + 1; j < parts.length; j++) {
+                            if (parts[j].match(/\d+/) || parts[j].match(/[A-Z]/)) {
+                                location += parts[j];
+                            } else {
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                
+                if (courseName) {
+                    courses.push({
+                        name: courseName,
+                        teacher: teacher,
+                        location: location,
+                        time: time,
+                        day: day,
+                        weeks: weeks.length > 0 ? weeks : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+                        originalText: line
+                    });
+                }
+            });
+            
+            return courses;
+        }
+        
+        // 解析周次
+        function parseWeeks(weekStr) {
+            const weeks = [];
+            weekStr = weekStr.replace(/[\(\（].*?[\)\）]/, '').replace('周', '');
+            
+            if (weekStr.includes('-')) {
+                const [start, end] = weekStr.split('-').map(Number);
+                for (let week = start; week <= end; week++) {
+                    weeks.push(week);
+                }
+            } else if (weekStr.includes(',')) {
+                weeks.push(...weekStr.split(',').map(Number));
+            } else {
+                const num = parseInt(weekStr);
+                if (!isNaN(num)) weeks.push(num);
+            }
+            
+            return weeks.filter(w => !isNaN(w));
+        }
+        
+        // 显示解析结果
+        function showParsedCourses(parsedCourses, modal) {
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3><i class="fas fa-check-circle"></i> 解析完成</h3>
+                    
+                    <p>成功解析 ${parsedCourses.length} 门课程：</p>
+                    
+                    <div class="course-preview">
+                        ${parsedCourses.map((course, index) => `
+                            <div class="course-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div class="course-time"><strong>星期${['一','二','三','四','五','六','日'][course.day-1]} ${course.time}</strong></div>
+                                        <div class="course-name"><strong>${course.name}</strong></div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; color: var(--accent);">${course.teacher || '教师'}</div>
+                                        <div style="font-size: 11px; opacity: 0.8;">${course.location || '地点'}</div>
+                                    </div>
+                                </div>
+                                <div style="font-size: 11px; margin-top: 5px; opacity: 0.9;">
+                                    周次：${course.weeks.join(',')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button id="confirmImport" class="btn-confirm">
+                            <i class="fas fa-check"></i> 确认导入
+                        </button>
+                        <button id="editCourses" class="btn-cancel">
+                            <i class="fas fa-edit"></i> 编辑
+                        </button>
+                        <button id="cancelParsed" class="btn-cancel">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('confirmImport').addEventListener('click', function() {
+                // 使用全局变量
+                window.courses = parsedCourses;
+                saveCourses();
+                drawCourses();
+                
+                // 添加历史记录
+                addHistoryRecord('course_imported', '导入课程表', `通过文本导入 ${parsedCourses.length} 门课程`);
+                drawHistory();
+                
+                alert(`✅ 成功导入 ${parsedCourses.length} 门课程！`);
+                document.body.removeChild(modal);
+            });
+            
+            document.getElementById('editCourses').addEventListener('click', function() {
+                // 调用手动编辑功能
+                showManualEdit(parsedCourses, modal, 'text');
+            });
+            
+            document.getElementById('cancelParsed').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+        }
+        
+        // 手动编辑界面
+        function showManualEdit(courses, modal, source = 'text') {
+            let currentCourses = [...courses];
+            
+            const modalContent = `
+                <div class="modal-content">
+                    <h3><i class="fas fa-edit"></i> 编辑课程</h3>
+                    <p style="opacity: 0.8; margin-bottom: 15px; font-size: 13px;">
+                        ${source === 'ocr' ? '修正AI识别结果' : '调整课程信息'}
+                    </p>
+                    
+                    <div id="editList" style="max-height: 300px; overflow-y: auto;">
+                        ${currentCourses.map((course, index) => `
+                            <div class="course-item" style="margin-bottom: 12px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                                    <div>
+                                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">星期</label>
+                                        <select id="daySelect_${index}" 
+                                                style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                            ${[1,2,3,4,5,6,7].map(d => `<option value="${d}" ${course.day === d ? 'selected' : ''}>星期${['一','二','三','四','五','六','日'][d-1]}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">时间</label>
+                                        <select id="timeSelect_${index}"
+                                                style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                            <option value="08:00" ${course.time === '08:00' ? 'selected' : ''}>第1~2节 (08:00)</option>
+                                            <option value="10:05" ${course.time === '10:05' ? 'selected' : ''}>第3~4节 (10:05)</option>
+                                            <option value="14:30" ${course.time === '14:30' ? 'selected' : ''}>第5~6节 (14:30)</option>
+                                            <option value="16:35" ${course.time === '16:35' ? 'selected' : ''}>第7~8节 (16:35)</option>
+                                            <option value="19:00" ${course.time === '19:00' ? 'selected' : ''}>第9~11节 (19:00)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 8px;">
+                                    <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">课程名称</label>
+                                    <input type="text" id="nameInput_${index}" value="${course.name}" 
+                                           style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                                    <div>
+                                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">教师</label>
+                                        <input type="text" id="teacherInput_${index}" value="${course.teacher || ''}" 
+                                               style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">地点</label>
+                                        <input type="text" id="locationInput_${index}" value="${course.location || ''}" 
+                                               style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px;">上课周次 (如: 1-18 或 1,3,5,7)</label>
+                                    <input type="text" id="weeksInput_${index}" value="${course.weeks?.join(',') || '1-18'}" 
+                                           style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: var(--text);">
+                                </div>
+                                
+                                <div style="text-align: right; margin-top: 8px;">
+                                    <button onclick="removeEditCourse(${index})" 
+                                            style="background: rgba(255,107,107,0.1); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button id="addNewCourseBtn" style="width: 100%; padding: 10px; margin: 10px 0; background: rgba(162,210,255,0.1); border: 1px solid rgba(162,210,255,0.3); color: var(--accent); border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-plus"></i> 添加新课程
+                    </button>
+                    
+                    <div class="modal-buttons">
+                        <button id="saveEditBtn" class="btn-confirm">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                        <button id="backEditBtn" class="btn-cancel">
+                            <i class="fas fa-arrow-left"></i> 返回
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.innerHTML = modalContent;
+            
+            // 为每个输入绑定事件
+            currentCourses.forEach((_, index) => {
+                // 星期选择
+                document.getElementById(`daySelect_${index}`).addEventListener('change', function() {
+                    currentCourses[index].day = parseInt(this.value);
+                });
+                
+                // 时间选择
+                document.getElementById(`timeSelect_${index}`).addEventListener('change', function() {
+                    currentCourses[index].time = this.value;
+                });
+                
+                // 课程名称
+                document.getElementById(`nameInput_${index}`).addEventListener('input', function() {
+                    currentCourses[index].name = this.value;
+                });
+                
+                // 教师
+                document.getElementById(`teacherInput_${index}`).addEventListener('input', function() {
+                    currentCourses[index].teacher = this.value;
+                });
+                
+                // 地点
+                document.getElementById(`locationInput_${index}`).addEventListener('input', function() {
+                    currentCourses[index].location = this.value;
+                });
+                
+                // 周次
+                document.getElementById(`weeksInput_${index}`).addEventListener('input', function() {
+                    currentCourses[index].weeks = parseWeeks(this.value);
+                });
+            });
+            
+            // 删除课程
+            window.removeEditCourse = function(index) {
+                if (confirm('确定要删除这门课程吗？')) {
+                    currentCourses.splice(index, 1);
+                    // 重新渲染编辑界面
+                    showManualEdit(currentCourses, modal, source);
+                }
+            };
+            
+            // 添加新课程
+            document.getElementById('addNewCourseBtn').addEventListener('click', function() {
+                currentCourses.push({
+                    name: '新课程',
+                    teacher: '',
+                    location: '',
+                    time: '08:00',
+                    day: 1,
+                    weeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+                });
+                // 重新渲染编辑界面
+                showManualEdit(currentCourses, modal, source);
+            });
+            
+            // 保存编辑
+            document.getElementById('saveEditBtn').addEventListener('click', function() {
+                window.courses = currentCourses;
+                saveCourses();
+                drawCourses();
+                
+                // 添加历史记录
+                addHistoryRecord('course_imported', '编辑课程表', `手动编辑了 ${currentCourses.length} 门课程`);
+                drawHistory();
+                
+                alert('✅ 课程已保存！');
+                document.body.removeChild(modal);
+            });
+            
+            // 返回按钮
+            document.getElementById('backEditBtn').addEventListener('click', function() {
+                showParsedCourses(currentCourses, modal);
+            });
+        }
+        
+        // 解析时间（辅助函数）
+        function parseTime(timeStr) {
+            if (!timeStr) return 0;
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + (minutes || 0);
+        }
+        
+        /* ========== 历史记录功能 ========== */
+        
+        function saveHistory() {
+            localStorage.setItem('solo-history', JSON.stringify(window.historyRecords));
+        }
+        
+        function drawHistory() {
+    console.log('绘制历史记录，记录数:', window.historyRecords.length);
+    historyList.innerHTML = '';
+    
+    if (window.historyRecords.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'history-item';
+        emptyMsg.innerHTML = '<p style="text-align: center; opacity: 0.5;">暂无历史记录</p>';
+        historyList.appendChild(emptyMsg);
+        return;
+    }
+    
+    // 倒序显示（最新的在最前面）
+    window.historyRecords.slice().reverse().forEach((record, displayIndex) => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        
+        // 计算实际索引（因为倒序显示）
+        const actualIndex = window.historyRecords.length - 1 - displayIndex;
+        
+        let content = '';
+        if (record.type === 'todo_completed') {
+            content = `✅ 完成待办事项<br>${record.todoCount || 0} 个事项已完成`;
+        } else if (record.type === 'pomodoro_completed') {
+            content = `🍅 番茄钟完成<br>时长: ${record.duration || '未知'}`;
+        } else if (record.type === 'plan_completed') {
+            content = `📝 计划完成<br>${record.content || ''}`;
+        } else if (record.type === 'course_imported') {
+            content = `📚 导入课程表<br>${record.content || ''}`;
+        } else if (record.type === 'course_cleared') {
+            content = `🗑️ 清空课程表<br>${record.content || ''}`;
+        } else {
+            content = record.content || '已完成事项';
+        }
+        
+        item.innerHTML = `
+            <div class="history-time">${record.time || '未知时间'}</div>
+            <div class="history-title">${record.title || '完成事项'}</div>
+            <div class="history-content">${content}</div>
+            <button class="history-delete-btn" data-index="${actualIndex}">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        historyList.appendChild(item);
+    });
+    
+    // 为所有删除按钮添加点击事件
+    document.querySelectorAll('.history-delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡
+            const index = parseInt(this.getAttribute('data-index'));
+            deleteHistoryRecord(index);
+        });
+    });
+}
+            
+            // 倒序显示（最新的在最前面）
+            window.historyRecords.slice().reverse().forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                
+                let content = '';
+                if (record.type === 'todo_completed') {
+                    content = `✅ 完成待办事项<br>${record.todoCount || 0} 个事项已完成`;
+                } else if (record.type === 'pomodoro_completed') {
+                    content = `🍅 番茄钟完成<br>时长: ${record.duration || '未知'}`;
+                } else if (record.type === 'plan_completed') {
+                    content = `📝 计划完成<br>${record.content || ''}`;
+                } else if (record.type === 'course_imported') {
+                    content = `📚 导入课程表<br>${record.content || ''}`;
+                } else if (record.type === 'course_cleared') {
+                    content = `🗑️ 清空课程表<br>${record.content || ''}`;
+                } else {
+                    content = record.content || '已完成事项';
+                }
+                
+                item.innerHTML = `
+                    <div class="history-time">${record.time || '未知时间'}</div>
+                    <div class="history-title">${record.title || '完成事项'}</div>
+                    <div class="history-content">${content}</div>
+                `;
+                historyList.appendChild(item);
+            });
+        
+        
+        // 添加历史记录
+        function addHistoryRecord(type, title, content, extraData = {}) {
+    
+            const record = {
+                time: new Date().toLocaleString(),
+                type: type,
+                title: title,
+                content: content,
+                ...extraData
+            };
+            
+            window.historyRecords.push(record);
+            
+            if (window.historyRecords.length > 50) {
+                window.historyRecords = window.historyRecords.slice(-50);
+            }
+            
+            saveHistory();
+            console.log('历史记录已添加:', record.title);
+        }
+        // 删除单条历史记录
+function deleteHistoryRecord(index) {
+    if (index < 0 || index >= window.historyRecords.length) return;
+    
+    if (confirm('确定要删除这条历史记录吗？')) {
+        // 从数组中删除
+        window.historyRecords.splice(index, 1);
+        
+        // 保存到localStorage
+        saveHistory();
+        
+        // 重新绘制历史记录
+        drawHistory();
+        
+        console.log(`已删除历史记录索引 ${index}`);
+    }
+}// 在页面加载完成部分添加
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('页面加载完成，初始化数据...');
+    console.log('课程数据:', window.courses);
+    console.log('历史记录:', window.historyRecords);
+    
+    drawCourses();
+    drawHistory();
+    
+    // 确保清空按钮事件绑定
+    clearAllHistoryBtn.addEventListener('click', function() {
+        if (window.historyRecords.length === 0) {
+            alert('历史记录已经是空的！');
+            return;
+        }
+        
+        if (confirm('确定要清空所有历史记录吗？此操作不可撤销！')) {
+            window.historyRecords = [];
+            saveHistory();
+            drawHistory();
+            alert('历史记录已清空！');
+        }
+    });
+});// 添加长按删除提示
+let longPressTimer = null;
+
+document.addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('history-delete-btn')) {
+        longPressTimer = setTimeout(() => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            if (confirm('长按确认删除这条记录？')) {
+                deleteHistoryRecord(index);
+            }
+        }, 1000); // 长按1秒
+    }
+});
+
+document.addEventListener('mouseup', function(e) {
+    if (e.target.classList.contains('history-delete-btn')) {
+        clearTimeout(longPressTimer);
+    }
+});
+
+// 添加键盘支持
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        const focusedDeleteBtn = document.querySelector('.history-delete-btn:hover');
+        if (focusedDeleteBtn) {
+            const index = parseInt(focusedDeleteBtn.getAttribute('data-index'));
+            deleteHistoryRecord(index);
+        }
+    }
+});
+        /* ========== 番茄钟功能 ========== */
+        let min = 25;
+        let sec = 0;
+        let tId = null;
+        let originalMin = 25;
+        let originalSec = 0;
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const completeBtn = document.getElementById('completeBtn');
+        const minutesDisplay = document.getElementById('minutes');
+        const secondsDisplay = document.getElementById('seconds');
+        
+        function renderTimer() {
+            minutesDisplay.textContent = String(min).padStart(2, '0');
+            secondsDisplay.textContent = String(sec).padStart(2, '0');
+        }
+        
+        document.querySelectorAll('.time-up').forEach(btn => {
+            btn.onclick = () => {
+                const unit = btn.dataset.unit;
+                if (unit === 'min') {
+                    min = Math.min(99, min + 1);
+                } else {
+                    sec = Math.min(59, sec + 1);
+                    if (sec === 60) {
+                        sec = 0;
+                        min = Math.min(99, min + 1);
+                    }
+                }
+                renderTimer();
+            };
+        });
+        
+        document.querySelectorAll('.time-down').forEach(btn => {
+            btn.onclick = () => {
+                const unit = btn.dataset.unit;
+                if (unit === 'min') {
+                    min = Math.max(0, min - 1);
+                } else {
+                    sec = Math.max(0, sec - 1);
+                    if (sec < 0) {
+                        if (min > 0) {
+                            min--;
+                            sec = 59;
+                        } else {
+                            sec = 0;
+                        }
+                    }
+                }
+                renderTimer();
+            };
+        });
+        
+        startBtn.onclick = () => {
+            if (tId) {
+                clearInterval(tId);
+                tId = null;
+                startBtn.textContent = '继续';
+            } else {
+                if (startBtn.textContent === '开始' || startBtn.textContent === '继续') {
+                    originalMin = min;
+                    originalSec = sec;
+                    startBtn.textContent = '暂停';
+                    tId = setInterval(() => {
+                        if (sec === 0) {
+                            if (min === 0) {
+                                clearInterval(tId);
+                                tId = null;
+                                startBtn.textContent = '开始';
+                                addHistoryRecord('pomodoro_completed', '番茄钟完成', `时长: ${originalMin}:${String(originalSec).padStart(2, '0')}`, {
+                                    duration: `${originalMin}:${String(originalSec).padStart(2, '0')}`
+                                });
+                                drawHistory();
+                                alert('番茄钟完成！');
+                                return;
+                            }
+                            min--;
+                            sec = 59;
+                        } else {
+                            sec--;
+                        }
+                        renderTimer();
+                    }, 1000);
+                }
+            }
+        };
+        
+        resetBtn.onclick = () => {
+            clearInterval(tId);
+            tId = null;
+            min = originalMin;
+            sec = originalSec;
+            renderTimer();
+            startBtn.textContent = '开始';
+        };
+        
+        completeBtn.onclick = () => {
+            if (tId) {
+                clearInterval(tId);
+                tId = null;
+            }
+            
+            const completedTodos = todos.filter(todo => todo.done);
+            const uncompletedTodos = todos.filter(todo => !todo.done);
+            const diaryContent = diary.value.trim();
+            
+            let summary = '';
+            
+            if (completedTodos.length > 0) {
+                summary += `✅ 已完成 ${completedTodos.length} 个事项:<br>`;
+                completedTodos.forEach((todo, index) => {
+                    summary += `${index + 1}. ${todo.text}<br>`;
+                });
+            }
+            
+            if (uncompletedTodos.length > 0) {
+                summary += `<br>❌ 未完成 ${uncompletedTodos.length} 个事项:<br>`;
+                uncompletedTodos.forEach((todo, index) => {
+                    summary += `${index + 1}. ${todo.text}<br>`;
+                });
+            }
+            
+            if (diaryContent) {
+                summary += `<br>📝 日记摘要:<br>${diaryContent.substring(0, 100)}${diaryContent.length > 100 ? '...' : ''}`;
+            }
+            
+            const pomodoroDuration = `${originalMin}:${String(originalSec).padStart(2, '0')}`;
+            
+            addHistoryRecord('todo_completed', '今日待办完成', summary, {
+                todoCount: todos.length,
+                completedCount: completedTodos.length,
+                pomodoroDuration: pomodoroDuration,
+                diaryPreview: diaryContent.substring(0, 100)
+            });
+            drawHistory();
+            
+            min = originalMin;
+            sec = originalSec;
+            renderTimer();
+            startBtn.textContent = '开始';
+            
+            alert(`✅ 今日待办已记录到历史！\n已完成 ${completedTodos.length}/${todos.length} 个事项`);
+        };
+        
+        renderTimer();
+        
+        /* ========== 待办功能 ========== */
+        const todoInput = document.getElementById('todoInput');
+        const todoList = document.getElementById('todoList');
+        let todos = JSON.parse(localStorage.getItem('solo-todos') || '[]');
+        
+        function saveTodos() {
+            localStorage.setItem('solo-todos', JSON.stringify(todos));
+        }
+        
+        function drawTodos() {
+            todoList.innerHTML = '';
+            todos.forEach((t, i) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="${t.done ? 'done' : ''}" data-i="${i}">${t.text}</span>
+                                <button data-i="${i}">×</button>`;
+                todoList.appendChild(li);
+            });
+        }
+        
+        todoInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && todoInput.value.trim()) {
+                todos.push({ text: todoInput.value.trim(), done: false });
+                todoInput.value = '';
+                saveTodos();
+                drawTodos();
+            }
+        });
+        
+        todoList.addEventListener('click', e => {
+            if (e.target.tagName === 'SPAN') {
+                const i = +e.target.dataset.i;
+                todos[i].done = !todos[i].done;
+                saveTodos();
+                drawTodos();
+            }
+            if (e.target.tagName === 'BUTTON') {
+                const i = +e.target.dataset.i;
+                todos.splice(i, 1);
+                saveTodos();
+                drawTodos();
+            }
+        });
+        
+        drawTodos();
+        // 导出日记功能
+function exportDiary() {
+    const diaryContent = diary.value;
+    if (!diaryContent.trim()) {
+        alert('日记内容为空！');
+        return;
+    }
+    
+    const blob = new Blob([diaryContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().split('T')[0];
+    
+    a.href = url;
+    a.download = `日记-${date}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('日记已导出为文本文件！');
+}
+
+// 导入日记功能
+function importDiary() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt';
+    
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            diary.value = event.target.result;
+            updateWordCount();
+            updateLastSavedTime();
+            alert('日记导入成功！');
+        };
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// 添加导出导入按钮到页面
+function addDiaryTools() {
+    const toolsDiv = document.createElement('div');
+    toolsDiv.className = 'diary-tools';
+    toolsDiv.style.cssText = `
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        justify-content: center;
+    `;
+    
+    const exportBtn = document.createElement('button');
+    exportBtn.innerHTML = '<i class="fas fa-download"></i> 导出日记';
+    exportBtn.onclick = exportDiary;
+    
+    const importBtn = document.createElement('button');
+    importBtn.innerHTML = '<i class="fas fa-upload"></i> 导入日记';
+    importBtn.onclick = importDiary;
+    
+    // 设置按钮样式
+    [exportBtn, importBtn].forEach(btn => {
+        btn.style.cssText = `
+            padding: 6px 12px;
+            background: rgba(162, 210, 255, 0.1);
+            border: 1px solid rgba(162, 210, 255, 0.3);
+            color: var(--accent);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        `;
+        btn.onmouseover = () => btn.style.background = 'rgba(162, 210, 255, 0.2)';
+        btn.onmouseout = () => btn.style.background = 'rgba(162, 210, 255, 0.1)';
+    });
+    
+    toolsDiv.appendChild(exportBtn);
+    toolsDiv.appendChild(importBtn);
+    
+    // 插入到日记区域后面
+    const diaryContainer = document.querySelector('.diary-container') || diary.parentElement;
+    diaryContainer.appendChild(toolsDiv);
+}
+
+// 在页面加载时添加工具按钮
+document.addEventListener('DOMContentLoaded', function() {
+    initDiary();
+    setTimeout(addDiaryTools, 100); // 稍后添加，确保DOM已加载
+});
+        
+       /* ========== 日记增强功能 ========== */
+const wordCountElement = document.getElementById('wordCount');
+const lastSavedElement = document.getElementById('lastSaved');
+const saveStatusElement = document.getElementById('saveStatus');
+let saveTimer = null;
+let lastSaveTime = null;
+
+
+// 统计字数
+function updateWordCount() {
+    const text = diary.value;
+    const wordCount = text.replace(/\s+/g, '').length; // 去除空格统计
+    wordCountElement.textContent = `${wordCount} 字`;
+    
+    // 根据字数显示颜色
+    if (wordCount === 0) {
+        wordCountElement.style.color = 'rgba(240, 240, 240, 0.5)';
+    } else if (wordCount < 50) {
+        wordCountElement.style.color = '#ff6b6b'; // 红色，字数较少
+    } else if (wordCount < 200) {
+        wordCountElement.style.color = '#feca57'; // 黄色，适中
+    } else {
+        wordCountElement.style.color = '#1dd1a1'; // 绿色，字数充足
+    }
+}
+
+// 显示保存状态
+function showSaveStatus(message, type = 'info') {
+    saveStatusElement.textContent = message;
+    saveStatusElement.style.color = type === 'saving' ? '#feca57' : 
+                                   type === 'saved' ? '#1dd1a1' : 
+                                   type === 'error' ? '#ff6b6b' : 
+                                   'rgba(240, 240, 240, 0.8)';
+    
+    // 3秒后清除状态
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+        saveStatusElement.textContent = '';
+    }, 3000);
+}
+
+// 更新最后保存时间
+function updateLastSavedTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('zh-CN', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    lastSavedElement.textContent = `${timeStr} 保存`;
+    lastSaveTime = now;
+    
+    // 保存到localStorage
+    localStorage.setItem('solo-diary', diary.value);
+    localStorage.setItem('solo-diary-last-saved', now.toISOString());
+}
+
+// 初始化日记功能
+function initDiary() {
+    // 加载上次保存的内容
+    const savedDiary = localStorage.getItem('solo-diary');
+    const lastSaved = localStorage.getItem('solo-diary-last-saved');
+    
+    if (savedDiary) {
+        diary.value = savedDiary;
+    }
+    
+    if (lastSaved) {
+        const lastTime = new Date(lastSaved);
+        const timeStr = lastTime.toLocaleTimeString('zh-CN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        lastSavedElement.textContent = `${timeStr} 保存`;
+        lastSaveTime = lastTime;
+    }
+    
+    // 初始字数统计
+    updateWordCount();
+    
+    // 监听输入事件
+    diary.addEventListener('input', () => {
+        updateWordCount();
+        
+        // 显示正在保存状态
+        showSaveStatus('正在保存...', 'saving');
+        
+        // 防抖保存（500毫秒后保存）
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+            updateLastSavedTime();
+            showSaveStatus('✓ 已保存', 'saved');
+        }, 500);
+    });
+    
+    // 监听焦点事件
+    diary.addEventListener('focus', () => {
+        diary.style.background = 'rgba(255, 255, 255, 0.08)';
+    });
+    
+    diary.addEventListener('blur', () => {
+        diary.style.background = 'rgba(255, 255, 255, 0.05)';
+    });
+    
+    // 添加键盘快捷键支持
+    diary.addEventListener('keydown', (e) => {
+        // Ctrl+S 或 Cmd+S 保存
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            updateLastSavedTime();
+            showSaveStatus('✓ 手动保存成功', 'saved');
+        }
+        
+        // 统计字数变化
+        setTimeout(updateWordCount, 0);
+    });
+}
+
+// 在页面加载时初始化日记功能
+document.addEventListener('DOMContentLoaded', function() {
+    initDiary();
+});
+        
+        /* ========== 音乐平台启动器功能 ========== */
+        const musicMainBtn = document.getElementById('musicMainBtn');
+        const musicPanel = document.getElementById('musicPanel');
+        const closePanelBtn = document.getElementById('closePanelBtn');
+        const customSearchInput = document.getElementById('customSearchInput');
+        const customSearchBtn = document.getElementById('customSearchBtn');
+        const platformSelect = document.getElementById('platformSelect');
+        
+        // 切换面板显示/隐藏
+        musicMainBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            musicPanel.style.display = 
+                musicPanel.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // 关闭面板
+        closePanelBtn.addEventListener('click', () => {
+            musicPanel.style.display = 'none';
+        });
+        
+        // 点击页面其他区域关闭面板
+        document.addEventListener('click', () => {
+            musicPanel.style.display = 'none';
+        });
+        
+        // 阻止面板内部点击触发关闭
+        musicPanel.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+        
+        // 平台项目点击事件
+        document.querySelectorAll('.platform-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                const platform = this.getAttribute('data-platform');
+                
+                // 记录用户选择偏好
+                localStorage.setItem('preferred-music-platform', platform);
+                
+                // 在新标签页打开平台搜索页
+                window.open(url, '_blank');
+                
+                // 关闭面板
+                musicPanel.style.display = 'none';
+                
+                // 给用户反馈
+                showMessage(`正在打开${this.querySelector('strong').textContent}...`);
+            });
+        });
+        
+        // 自定义搜索功能
+        function performCustomSearch() {
+            const query = customSearchInput.value.trim();
+            if (!query) {
+                showMessage('请输入搜索内容', 'warning');
+                customSearchInput.focus();
+                return;
+            }
+        
+            const selectedPlatform = platformSelect.value;
+            const encodedQuery = encodeURIComponent(query);
+            let searchUrl = '';
+        
+            // 根据不同平台构建搜索URL
+            switch(selectedPlatform) {
+                case 'qqmusic':
+                    searchUrl = `https://y.qq.com/portal/search.html?remoteplace=txt.yqq.top&t=song&w=${encodedQuery}`;
+                    break;
+                case 'ncm':
+                    searchUrl = `https://music.163.com/#/search/m/?s=${encodedQuery}&type=1`;
+                    break;
+                default:
+                    searchUrl = `https://y.qq.com/portal/search.html?w=${encodedQuery}`;
+            }
+        
+            // 打开搜索页面
+            window.open(searchUrl, '_blank');
+            
+            // 清空输入框并关闭面板
+            customSearchInput.value = '';
+            musicPanel.style.display = 'none';
+            
+            // 保存搜索历史
+            saveSearchHistory(query, selectedPlatform);
+        }
+        
+        // 绑定搜索事件
+        customSearchBtn.addEventListener('click', performCustomSearch);
+        customSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                performCustomSearch();
+            }
+        });
+        
+        // 保存搜索历史（简化版）
+        function saveSearchHistory(query, platform) {
+            const history = JSON.parse(localStorage.getItem('music-search-history') || '[]');
+            history.unshift({
+                query: query,
+                platform: platform,
+                timestamp: new Date().toISOString()
+            });
+            // 只保留最近10条
+            if (history.length > 10) history.pop();
+            localStorage.setItem('music-search-history', JSON.stringify(history));
+        }
+        
+        // 显示临时消息
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = text;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'warning' ? 'rgba(255, 100, 100, 0.9)' : 'rgba(162, 210, 255, 0.9)'};
+                color: #000;
+                padding: 12px 24px;
+                border-radius: 10px;
+                z-index: 1000;
+                font-weight: 600;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: fadeOut 3s forwards;
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+        
+        // 初始化：恢复用户平台偏好
+        const preferredPlatform = localStorage.getItem('preferred-music-platform');
+        if (preferredPlatform) {
+            platformSelect.value = preferredPlatform;
+        }
+        
+        /* ========== 页面初始化 ========== */
+        // 页面加载时绘制课程表和历史记录
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化数据...');
+            console.log('课程数据:', window.courses);
+            console.log('历史记录:', window.historyRecords);
+            
+            drawCourses();
+            drawHistory();
+        });
+        
+        // 添加调试按钮（可选）
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = '调试';
+        debugBtn.style.cssText = 'position: fixed; bottom: 150px; right: 25px; z-index: 100; padding: 10px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;';
+        debugBtn.onclick = function() {
+            console.log('=== 调试信息 ===');
+            console.log('1. 课程数据:', window.courses);
+            console.log('2. localStorage课程:', localStorage.getItem('solo-courses'));
+            console.log('3. 历史记录:', window.historyRecords);
+            console.log('4. localStorage历史记录:', localStorage.getItem('solo-history'));
+            alert('调试信息已输出到控制台');
+        };
+        document.body.appendChild(debugBtn);
+        
+    </script>
+</body>
+</html>
